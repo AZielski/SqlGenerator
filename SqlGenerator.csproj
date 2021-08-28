@@ -3,6 +3,17 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
+    <SignAssembly>false</SignAssembly>
+    <NeutralLanguage>en</NeutralLanguage>
+    <RepositoryUrl>https://github.com/AZielski/SqlGenerator</RepositoryUrl>
+    <Company>Alan Zieliński</Company>
+    <Authors>Alan Zieliński</Authors>
+    <PackageId>MySqlGenerator</PackageId>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>First release version of project.</PackageReleaseNotes>
+    <Copyright>All rights reserved</Copyright>
+    <Description>Product for generation MySQL databases from json file.</Description>
+    <Product>MySql generator</Product>
   </PropertyGroup>
 
 </Project>

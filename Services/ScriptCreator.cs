@@ -18,6 +18,12 @@ namespace SqlGenerator.Services
         };
 
         private static string CreateWithEndLine(string data) => $"{data}\n";
+        
+        /// <summary>
+        /// Main method which handles process of creating db.
+        /// </summary>
+        /// <param name="DBToGenerate">Data to generate from.</param>
+        /// <returns>MySql script in string to save.</returns>
         public static string GenerateDB(InitialDBTemplate DBToGenerate)
         {
             try
@@ -47,6 +53,11 @@ namespace SqlGenerator.Services
             }
         }
 
+        /// <summary>
+        /// Generates table.
+        /// </summary>
+        /// <param name="table">Data to create from.</param>
+        /// <returns>Return MySql table data in string.</returns>
         private static string GenerateTables(TableDBTemplate table)
         {
             try
@@ -85,6 +96,11 @@ namespace SqlGenerator.Services
             }
         }
 
+        /// <summary>
+        /// Generates columns for tables.
+        /// </summary>
+        /// <param name="column">Column data to create from.</param>
+        /// <returns>MySql script in string.</returns>
         private static string GenerateColumn(ColumnDBTemplate column)
         {
             try

@@ -1,4 +1,4 @@
-﻿namespace SqlGenerator.DataTemplates
+﻿namespace Data.DBDataTemplates
 {
     public sealed class ForeignDataDBTemplate
     {

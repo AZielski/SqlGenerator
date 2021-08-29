@@ -1,9 +1,9 @@
-﻿using SqlGenerator.DataTemplates;
+﻿using Data.DBDataTemplates;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SqlGenerator.Services
+namespace Services
 {
     public static class ScriptCreator
     {
@@ -38,9 +38,7 @@ namespace SqlGenerator.Services
 
                 foreach (var table in DBToGenerate.Tables)
                 {
-                    Console.WriteLine($"[INFO] Starting create {table.TableName} table");
                     result += GenerateTables(table);
-                    Console.WriteLine($"[INFO] End of create {table.TableName} table");
                 }
 
                 result += CreateWithEndLine("COMMIT;");
@@ -66,22 +64,18 @@ namespace SqlGenerator.Services
 
                 foreach (var column in table.TableColumns)
                 {
-                    Console.WriteLine($"[INFO] Starting create {table.TableName} column");
                     result += GenerateColumn(column);
-                    Console.WriteLine($"[INFO] End of create {table.TableName} column");
                 }
 
                 var primaryKeyColumn = table.TableColumns.Where(x => x.IsPrimaryKey).FirstOrDefault();
                 if (primaryKeyColumn != null)
                 {
-                    Console.WriteLine($"[INFO] Adding primary key {primaryKeyColumn.ColumnName} to {table.TableName} table");
                     result += CreateWithEndLine($"PRIMARY KEY(`{primaryKeyColumn.ColumnName}`),");
                 }
 
                 var foreignColumnList = table.TableColumns.Where(x => x.ForeignData != null).ToList();
                 foreach (var item in foreignColumnList)
                 {
-                    Console.WriteLine($"[INFO] Adding foreign key {item.ColumnName} to {item.ForeignData.TableName} table");
                     result += CreateWithEndLine($"FOREIGN KEY ({item.ColumnName}) REFERENCES {item.ForeignData.TableName}({item.ForeignData.ColumnName}),");
                 }
 

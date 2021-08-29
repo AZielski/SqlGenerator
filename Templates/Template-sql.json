@@ -1,0 +1,127 @@
+{
+    "DBName": "DBName",
+    "Collation": "utf8_general_ci",
+    "Tables": [
+        {
+            "TableName": "Address",
+            "TableColumns": [
+                {
+                    "ColumnName": "address_pk",
+                    "DBType": "int",
+                    "IsPrimaryKey": true,
+                    "IsAutoIncrement": true,
+                    "IsNullable": false,
+                    "MaxValue": null,
+                    "DefaultValue": null,
+                    "ForeignData": null
+                },
+                {
+                    "ColumnName": "address",
+                    "DBType": "varchar",
+                    "IsPrimaryKey": false,
+                    "IsAutoIncrement": false,
+                    "IsNullable": true,
+                    "MaxValue": 1000,
+                    "DefaultValue": "World",
+                    "ForeignData": null
+                }
+            ]
+        },
+        {
+            "TableName": "Work",
+            "TableColumns": [
+                {
+                    "ColumnName": "work_pk",
+                    "DBType": "int",
+                    "IsPrimaryKey": true,
+                    "IsAutoIncrement": true,
+                    "IsNullable": false,
+                    "MaxValue": null,
+                    "DefaultValue": null,
+                    "ForeignData": null
+                },
+                {
+                    "ColumnName": "name",
+                    "DBType": "varchar",
+                    "IsPrimaryKey": false,
+                    "IsAutoIncrement": false,
+                    "IsNullable": true,
+                    "MaxValue": 300,
+                    "DefaultValue": "self",
+                    "ForeignData": null
+                }
+            ]
+        },
+        {
+            "TableName": "Person",
+            "TableColumns": [
+                {
+                    "ColumnName": "person_key",
+                    "DBType": "int",
+                    "IsPrimaryKey": true,
+                    "IsAutoIncrement": true,
+                    "IsNullable": false,
+                    "MaxValue": null,
+                    "DefaultValue": null,
+                    "ForeignData": null
+                },
+                {
+                    "ColumnName": "name",
+                    "DBType": "varchar",
+                    "IsPrimaryKey": false,
+                    "IsAutoIncrement": false,
+                    "IsNullable": false,
+                    "MaxValue": 300,
+                    "DefaultValue": null,
+                    "ForeignData": null
+                },
+                {
+                    "ColumnName": "lastname",
+                    "DBType": "varchar",
+                    "IsPrimaryKey": false,
+                    "IsAutoIncrement": false,
+                    "IsNullable": false,
+                    "MaxValue": 300,
+                    "DefaultValue": null,
+                    "ForeignData": null
+                },
+                {
+                    "ColumnName": "birthdate",
+                    "DBType": "date",
+                    "IsPrimaryKey": false,
+                    "IsAutoIncrement": false,
+                    "IsNullable": false,
+                    "MaxValue": null,
+                    "DefaultValue": null,
+                    "ForeignData": null
+                },
+                {
+                    "ColumnName": "address_fk",
+                    "DBType": "int",
+                    "IsPrimaryKey": false,
+                    "IsAutoIncrement": false,
+                    "IsNullable": false,
+                    "MaxValue": null,
+                    "DefaultValue": null,
+                    "ForeignData": {
+                        "ColumnName": "address_pk",
+                        "TableName": "Address"
+                    }
+                },
+                {
+                    "ColumnName": "work_fk",
+                    "DBType": "int",
+                    "IsPrimaryKey": false,
+                    "IsAutoIncrement": false,
+                    "IsNullable": false,
+                    "MaxValue": null,
+                    "DefaultValue": null,
+                    "ForeignData": {
+                        "ColumnName": "work_pk",
+                        "TableName": "Work"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -18,7 +18,7 @@ namespace Services
         };
 
         private static string CreateWithEndLine(string data) => $"{data}\n";
-        
+
         /// <summary>
         /// Main method which handles process of creating db.
         /// </summary>

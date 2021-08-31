@@ -1,0 +1,25 @@
+{
+    "WebsiteName": "Playcount",
+    "HasNavbar": true,
+    "HasExternalCss": true,
+    "Database": {
+        "ServerName": "localhost",
+        "ServerPassword": "",
+        "DBName": "",
+        "ServerLogin": "root"
+    },
+    "Subpage": [
+        {
+            "Name": "About us",
+            "IsInNavbar": true
+        },
+        {
+            "Name": "Contact",
+            "IsInNavbar": true
+        },
+        {
+            "Name": "Main page",
+            "IsInNavbar": true
+        }
+    ]
+}

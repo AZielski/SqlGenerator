@@ -42,7 +42,7 @@
                 },
                 {
                     "ColumnName": "name",
-                    "DBType": "varchar",
+                    "DBType": "decimal",
                     "IsPrimaryKey": false,
                     "IsAutoIncrement": false,
                     "IsNullable": true,

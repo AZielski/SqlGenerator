@@ -2,13 +2,14 @@
     "WebsiteName": "Playcount",
     "HasNavbar": true,
     "HasExternalCss": true,
+    "HtmlContent": "",
     "Database": {
         "ServerName": "localhost",
         "ServerPassword": "",
-        "DBName": "",
+        "DbName": "",
         "ServerLogin": "root"
     },
-    "Subpage": [
+    "Subpages": [
         {
             "Name": "About us",
             "IsInNavbar": true

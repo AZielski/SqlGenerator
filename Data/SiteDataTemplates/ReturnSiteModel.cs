@@ -4,5 +4,6 @@ namespace Data.SiteDataTemplates
     {
         public string PathToFile { get; set; }
         public string FileContent { get; set; }
+        public bool IsSubpage { get; set; }
     }
 }

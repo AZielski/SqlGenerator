@@ -1,20 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Data;
 using Data.SiteDataTemplates;
+using Helpers;
 
 namespace Service
 {
     public static class SiteCreator
     {
-        public static List<ReturnSiteModel> GenerateWebsite(InitialSiteTemplate template)
+        public static List<ReturnSiteModel> CreateWebsite(InitialSiteTemplate template)
         {
             try
             {
-                var returnSite = new List<ReturnSiteModel>();
                 var navbar = GenerateNavbar(template.Subpages);
+                var db = PrepareDatabaseData(template.Database);
 
-                returnSite.Add(PrepareIndex(template));
+                var returnSite = new List<ReturnSiteModel> { PreparePage(navbar, template.WebsiteName, template.HtmlContent, db, true, false) };
+
+                foreach (var subpage in template.Subpages)
+                {
+                    returnSite.Add(
+                      PreparePage(navbar, subpage.Name, subpage.HtmlContent, db)
+                    );
+                }
 
                 if (template.HasExternalCss)
                 {
@@ -29,31 +38,36 @@ namespace Service
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] {ex}");
+                LogHelper.LogError($"Error thrown in method {nameof(CreateWebsite)}", ex);
                 throw;
             }
         }
 
-        private static ReturnSiteModel PrepareIndex(InitialSiteTemplate template)
+        private static ReturnSiteModel PreparePage(string navBar, string websiteName, string htmlContent, string dbReplacement, bool isIndex = false, bool isSubpage = true)
         {
             try
             {
                 var phpTemplate = Resources.PHPTemplate;
-                var returnData = new ReturnSiteModel();
 
-                phpTemplate = phpTemplate.Replace("##NAVBAR##", GenerateNavbar(template.Subpages));
-                phpTemplate = phpTemplate.Replace("##WEBSITE_TITLE##", template.WebsiteName);
-                phpTemplate = phpTemplate.Replace("##HTML_CONTENT##", template.HTMLContent);
-                phpTemplate = phpTemplate.Replace("##DB##", PrepareDatabaseData(template.Database));
+                if (isIndex)
+                {
+                    phpTemplate = phpTemplate.Replace("##WEBSITE_TITLE##", websiteName);
+                }
 
-                returnData.PathToFile = "index.php";
-                returnData.FileContent = phpTemplate;
+                phpTemplate = phpTemplate.Replace("##NAVBAR##", navBar);
+                phpTemplate = phpTemplate.Replace("##HTML_CONTENT##", htmlContent);
+                phpTemplate = phpTemplate.Replace("##DB##", dbReplacement);
 
-                return returnData;
+                return new ReturnSiteModel()
+                {
+                    FileContent = phpTemplate,
+                    IsSubpage = isSubpage,
+                    PathToFile = isIndex ? "index.php" : $"{ websiteName.Replace(" ", "") }.php"
+                };
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] {ex}");
+                LogHelper.LogError($"Error thrown in method {nameof(PreparePage)}", ex);
                 throw;
             }
         }
@@ -62,18 +76,18 @@ namespace Service
         {
             try
             {
-                var databaseReplace = Resources.ResourceManager.GetString("DBTemplate");
+                var databaseReplace = Resources.ResourceManager.GetString("DBTemplate") ?? "";
 
-                databaseReplace = databaseReplace.Replace("##DATABASE##", template.DBName);
+                databaseReplace = databaseReplace.Replace("##DATABASE##", template.DbName);
                 databaseReplace = databaseReplace.Replace("##USERNAME##", template.ServerLogin);
                 databaseReplace = databaseReplace.Replace("##PASSWORD##", template.ServerPassword);
                 databaseReplace = databaseReplace.Replace("##SERVER_NAME##", template.ServerName);
 
                 return databaseReplace;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] {ex}");
+                LogHelper.LogError($"Error thrown in method {nameof(PrepareDatabaseData)}", ex);
                 throw;
             }
         }
@@ -82,25 +96,20 @@ namespace Service
         {
             try
             {
-                if (template == null)
-                {
-                    return "";
-                }
-
-                var navbar = Resources.NavbarTemplate;
-                string linksToSubpages = "";
+                var phpTemplate = Resources.ResourceManager.GetString("PHPLink");
+                var links = "";
 
                 foreach (var item in template)
                 {
-                    linksToSubpages += Resources.ResourceManager.GetString("PHPLink").Replace("##PAGE_NAME_URI##", item.Name.Replace(" ", "")).Replace("##PAGE_NAME##", item.Name);
+                    links += phpTemplate.Replace("##PAGE_NAME_URI##", item.Name.Replace(" ", "")).Replace("##PAGE_NAME##", item.Name);
                 }
 
-                navbar = navbar.Replace("##LINKS##", linksToSubpages);
-                return navbar;
+                Console.WriteLine(links);
+                return Resources.ResourceManager.GetString("PHPNavbar").Replace("##LINKS##", links);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] {ex}");
+                LogHelper.LogError($"Error thrown in method {nameof(GenerateNavbar)}", ex);
                 throw;
             }
         }

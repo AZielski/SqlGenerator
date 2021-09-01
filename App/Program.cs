@@ -1,11 +1,9 @@
-﻿using Data;
-using Data.DBDataTemplates;
+﻿using Data.DBDataTemplates;
 using Data.SiteDataTemplates;
+using Helpers;
 using Service;
-using Services;
 using System;
 using System.IO;
-using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -13,7 +11,7 @@ namespace SqlGenerator
 {
     class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             try
             {
@@ -29,15 +27,14 @@ namespace SqlGenerator
                             break;
                         case "--help":
                         default:
-                            Console.WriteLine(Resources.ResourceManager.GetString("ConsoleHelp"));
+                            Console.WriteLine("Possible params\n--help\n--generate-sql\n--generate-web");
                             break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] {ex}");
-                throw;
+                LogHelper.LogError($"Thrown by method {nameof(Main)}", ex);
             }
         }
 
@@ -45,8 +42,8 @@ namespace SqlGenerator
         {
             try
             {
-                InitialSiteTemplate template;
-                const string RESULT_PATH = "Result/PHPSITE/";
+                InitialSiteTemplate templateSql;
+                const string resultPath = "Result/Website/";
 
                 Console.WriteLine("Pass the path to template.");
                 string path = Console.ReadLine();
@@ -59,37 +56,41 @@ namespace SqlGenerator
 
                 using (StreamReader sr = new StreamReader(path))
                 {
-                    template = JsonSerializer.Deserialize<InitialSiteTemplate>(sr.ReadToEnd());
+                    templateSql = JsonSerializer.Deserialize<InitialSiteTemplate>(await sr.ReadToEndAsync());
                     sr.Close();
                 }
 
-                if (!Directory.Exists(RESULT_PATH))
+                if (!Directory.Exists($"./{resultPath}"))
                 {
-                    Directory.CreateDirectory($"./{RESULT_PATH}");
+                    Directory.CreateDirectory($"./{resultPath}");
                 }
 
-                var files = SiteCreator.GenerateWebsite(template);
-
-                foreach (var item in files)
+                if (!Directory.Exists($"./{resultPath}/Subpages/"))
                 {
-                    var filepath = $"./{RESULT_PATH}/{item.PathToFile}";
-                    using (StreamWriter sw = new(filepath))
+                    Directory.CreateDirectory($"./{resultPath}/Subpages/");
+                }
+
+                foreach (var item in SiteCreator.CreateWebsite(templateSql))
+                {
+                    string pathInResultFolder;
+
+                    if (item.IsSubpage)
                     {
-                        if (!File.Exists(filepath))
-                        {
-                            File.Create(filepath).Close();
-                        }
-
-                        await sw.WriteAsync(item.FileContent);
+                        pathInResultFolder = $"./{resultPath}/Subpages/{item.PathToFile}";
                     }
-                }
+                    else
+                    {
+                        pathInResultFolder = $"./{resultPath}/{item.PathToFile}";
+                    }
 
-                Console.WriteLine($"[INFO] Result is in {Assembly.GetExecutingAssembly().Location}\\{RESULT_PATH}");
+                    using StreamWriter sw = new(pathInResultFolder);
+                    await sw.WriteAsync(item.FileContent);
+                    sw.Close();
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] {ex}");
-                throw;
+                LogHelper.LogError($"Thrown by method {nameof(GenerateSite)}", ex);
             }
         }
 
@@ -98,7 +99,7 @@ namespace SqlGenerator
             try
             {
                 InitialDBTemplate template;
-                const string RESULT_PATH = "Result.sql";
+                const string resultPath = "Result.sql";
 
                 Console.WriteLine("Pass the path to template.");
                 string path = Console.ReadLine();
@@ -115,24 +116,21 @@ namespace SqlGenerator
                     sr.Close();
                 }
 
-                if (!File.Exists($"./{RESULT_PATH}"))
+                if (!File.Exists($"./{resultPath}"))
                 {
-                    File.Create($"./{RESULT_PATH}").Close();
+                    File.Create($"./{resultPath}").Close();
                 }
 
-                var templateSQL = ScriptCreator.GenerateDB(template);
+                var templateSQL = ScriptCreator.CreateDb(template);
 
-                using (StreamWriter sw = new($"./{RESULT_PATH}"))
+                using (StreamWriter sw = new($"./{resultPath}"))
                 {
                     await sw.WriteAsync(templateSQL);
                 }
-
-                Console.WriteLine($"[INFO] Result is in {Assembly.GetExecutingAssembly().Location}\\{RESULT_PATH}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] {ex}");
-                throw;
+                LogHelper.LogError($"Thrown by method {nameof(GenerateSql)}", ex);
             }
         }
     }

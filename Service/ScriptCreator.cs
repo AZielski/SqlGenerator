@@ -1,13 +1,14 @@
-﻿using Data.DBDataTemplates;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Data.DBDataTemplates;
+using Helpers;
 
-namespace Services
+namespace Service
 {
     public static class ScriptCreator
     {
-        public static Dictionary<string, string> DBMysqlTypes = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> DbMysqlTypes = new Dictionary<string, string>
         {
             {"varchar", "VARCHAR" },
             {"text", "TEXT" },
@@ -22,13 +23,13 @@ namespace Services
         /// <summary>
         /// Main method which handles process of creating db.
         /// </summary>
-        /// <param name="DBToGenerate">Data to generate from.</param>
+        /// <param name="dbToGenerate">Data to generate from.</param>
         /// <returns>MySql script in string to save.</returns>
-        public static string GenerateDB(InitialDBTemplate DBToGenerate)
+        public static string CreateDb(InitialDBTemplate dbToGenerate)
         {
             try
             {
-                string result = CreateWithEndLine("SET SQL_MODE = \"NO_AUTO_VALUE_ON_ZERO\";");
+                var result = CreateWithEndLine("SET SQL_MODE = \"NO_AUTO_VALUE_ON_ZERO\";");
                 result += CreateWithEndLine("START TRANSACTION;");
                 result += CreateWithEndLine("SET time_zone = \"+00:00\";");
                 result += CreateWithEndLine("/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;");
@@ -36,9 +37,9 @@ namespace Services
                 result += CreateWithEndLine("/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;");
                 result += CreateWithEndLine("/*!40101 SET NAMES utf8mb4 */;");
 
-                foreach (var table in DBToGenerate.Tables)
+                foreach (var table in dbToGenerate.Tables)
                 {
-                    result += GenerateTables(table);
+                    result += CreateTables(table);
                 }
 
                 result += CreateWithEndLine("COMMIT;");
@@ -46,7 +47,7 @@ namespace Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR]: {ex}");
+                LogHelper.LogError($"Error thrown in method {nameof(CreateDb)}", ex);
                 throw;
             }
         }
@@ -56,24 +57,22 @@ namespace Services
         /// </summary>
         /// <param name="table">Data to create from.</param>
         /// <returns>Return MySql table data in string.</returns>
-        private static string GenerateTables(TableDBTemplate table)
+        private static string CreateTables(TableDBTemplate table)
         {
             try
             {
                 var result = CreateWithEndLine($"CREATE TABLE `{table.TableName}` (");
 
-                foreach (var column in table.TableColumns)
-                {
-                    result += GenerateColumn(column);
-                }
+                result = table.TableColumns.Aggregate(result, (current, column) => current + CreateColumn(column));
 
-                var primaryKeyColumn = table.TableColumns.Where(x => x.IsPrimaryKey).FirstOrDefault();
+                var primaryKeyColumn = table.TableColumns.FirstOrDefault(x => x.IsPrimaryKey);
                 if (primaryKeyColumn != null)
                 {
                     result += CreateWithEndLine($"PRIMARY KEY(`{primaryKeyColumn.ColumnName}`),");
                 }
 
                 var foreignColumnList = table.TableColumns.Where(x => x.ForeignData != null).ToList();
+
                 foreach (var item in foreignColumnList)
                 {
                     result += CreateWithEndLine($"FOREIGN KEY ({item.ColumnName}) REFERENCES {item.ForeignData.TableName}({item.ForeignData.ColumnName}),");
@@ -85,7 +84,7 @@ namespace Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR]: {ex}");
+                LogHelper.LogError($"Error thrown in method {nameof(CreateTables)}", ex);
                 throw;
             }
         }
@@ -95,23 +94,19 @@ namespace Services
         /// </summary>
         /// <param name="column">Column data to create from.</param>
         /// <returns>MySql script in string.</returns>
-        private static string GenerateColumn(ColumnDBTemplate column)
+        private static string CreateColumn(ColumnDBTemplate column)
         {
             try
             {
-                var result = $"`{column.ColumnName}` {DBMysqlTypes[column.DBType]}";
+                var result = $"`{column.ColumnName}` {DbMysqlTypes[column.DbType]}";
 
                 if (column.MaxValue.HasValue)
                 {
-                    switch (column.DBType)
+                    result += column.DbType switch
                     {
-                        case "decimal":
-                            result += $" ({column.MaxValue.Value - 2}, 2)";
-                            break;
-                        default:
-                            result += $" ({column.MaxValue.Value})";
-                            break;
-                    }
+                        "decimal" => $" ({column.MaxValue.Value - 2}, 2)",
+                        _ => $" ({column.MaxValue.Value})"
+                    };
                 }
 
                 result += $"{(column.IsNullable ? " NULL" : " NOT NULL")}";
@@ -126,7 +121,7 @@ namespace Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR]: {ex}");
+                LogHelper.LogError($"Error thrown in method {nameof(CreateColumn)}", ex);
                 throw;
             }
         }

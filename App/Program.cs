@@ -9,128 +9,87 @@ using System.Threading.Tasks;
 
 namespace SqlGenerator
 {
-    class Program
+    internal static class Program
     {
         public static async Task Main(string[] args)
         {
             try
             {
-                foreach (var argument in args)
+                if (string.IsNullOrEmpty(args[1]) || !File.Exists(args[1]))
                 {
-                    switch (argument)
-                    {
-                        case "--generate-web":
-                            await GenerateSite();
-                            break;
-                        case "--generate-sql":
-                            await GenerateSql();
-                            break;
-                        case "--help":
-                        default:
-                            Console.WriteLine("Possible params\n--help\n--generate-sql\n--generate-web");
-                            break;
-                    }
+                    Console.WriteLine(@"No path passed or path was incorrect, reopen program and pass path.");
+                    return;
+                }
+
+                switch (args[0])
+                {
+                    case "--generate-web":
+                        await GenerateSite(args[1]);
+                        return;
+                    case "--generate-sql":
+                        await GenerateSql(args[1]);
+                        return;
+                    default:
+                        await LogHelper.LogTraceAsync("Possible params\n--help\n--generate-sql <Json path>\n--generate-web <Json path>");
+                        return;
                 }
             }
             catch (Exception ex)
             {
-                LogHelper.LogError($"Thrown by method {nameof(Main)}", ex);
+                await LogHelper.LogErrorAsync($"Thrown by method {nameof(Main)}", ex);
             }
         }
 
-        private static async Task GenerateSite()
+        private static async Task GenerateSite(string pathToJson)
         {
             try
             {
-                InitialSiteTemplate templateSql;
                 const string resultPath = "Result/Website/";
 
-                Console.WriteLine("Pass the path to template.");
-                string path = Console.ReadLine();
-
-                if (string.IsNullOrEmpty(path))
-                {
-                    Console.WriteLine("No path passed, reopen program and pass path.");
-                    return;
-                }
-
-                using (StreamReader sr = new StreamReader(path))
-                {
-                    templateSql = JsonSerializer.Deserialize<InitialSiteTemplate>(await sr.ReadToEndAsync());
-                    sr.Close();
-                }
-
-                if (!Directory.Exists($"./{resultPath}"))
-                {
-                    Directory.CreateDirectory($"./{resultPath}");
-                }
+                using var sr = new StreamReader(pathToJson);
+                var template = JsonSerializer.Deserialize<InitialSiteTemplate>(await sr.ReadToEndAsync());
+                sr.Close();
 
                 if (!Directory.Exists($"./{resultPath}/Subpages/"))
                 {
                     Directory.CreateDirectory($"./{resultPath}/Subpages/");
                 }
 
-                foreach (var item in SiteCreator.CreateWebsite(templateSql))
+                foreach (var item in SiteCreator.CreateWebsite(template))
                 {
-                    string pathInResultFolder;
-
-                    if (item.IsSubpage)
-                    {
-                        pathInResultFolder = $"./{resultPath}/Subpages/{item.PathToFile}";
-                    }
-                    else
-                    {
-                        pathInResultFolder = $"./{resultPath}/{item.PathToFile}";
-                    }
-
-                    using StreamWriter sw = new(pathInResultFolder);
+                    var pathInResultFolder = item.IsSubpage ? $"./{resultPath}/Subpages/{item.PathToFile}" : $"./{resultPath}/{item.PathToFile}";
+                    await using StreamWriter sw = new(pathInResultFolder);
                     await sw.WriteAsync(item.FileContent);
                     sw.Close();
                 }
             }
             catch (Exception ex)
             {
-                LogHelper.LogError($"Thrown by method {nameof(GenerateSite)}", ex);
+                await LogHelper.LogErrorAsync($"Thrown by method {nameof(GenerateSite)}", ex);
             }
         }
 
-        private static async Task GenerateSql()
+        private static async Task GenerateSql(string pathToJson)
         {
             try
             {
-                InitialDBTemplate template;
                 const string resultPath = "Result.sql";
 
-                Console.WriteLine("Pass the path to template.");
-                string path = Console.ReadLine();
-
-                if (string.IsNullOrEmpty(path))
-                {
-                    Console.WriteLine("No path passed, reopen program and pass path.");
-                    return;
-                }
-
-                using (StreamReader sr = new StreamReader(path))
-                {
-                    template = JsonSerializer.Deserialize<InitialDBTemplate>(sr.ReadToEnd());
-                    sr.Close();
-                }
+                using var sr = new StreamReader(pathToJson);
+                var template = JsonSerializer.Deserialize<InitialDBTemplate>(await sr.ReadToEndAsync());
+                sr.Close();
 
                 if (!File.Exists($"./{resultPath}"))
                 {
                     File.Create($"./{resultPath}").Close();
                 }
 
-                var templateSQL = ScriptCreator.CreateDb(template);
-
-                using (StreamWriter sw = new($"./{resultPath}"))
-                {
-                    await sw.WriteAsync(templateSQL);
-                }
+                await using StreamWriter sw = new($"./{resultPath}");
+                await sw.WriteAsync(ScriptCreator.CreateDb(template));
             }
             catch (Exception ex)
             {
-                LogHelper.LogError($"Thrown by method {nameof(GenerateSql)}", ex);
+                await LogHelper.LogErrorAsync($"Thrown by method {nameof(GenerateSql)}", ex);
             }
         }
     }

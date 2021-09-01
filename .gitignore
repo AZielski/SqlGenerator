@@ -366,3 +366,6 @@ FodyWeavers.xsd
 Result.*
 Result/*
 Result/
+
+# Logs
+Logs/*

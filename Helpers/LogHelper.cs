@@ -70,10 +70,16 @@ namespace Helpers
         /// <param name="toWrite">Text which will be saved.</param>
         private static async Task CreateLogAsync(string toWrite)
         {
-            var filePath = $"{Path}_{DateTime.Now:MMddyyyyHH}.txt";
+            var filePath = $"./Logs/{Path}_{DateTime.Now:MMddyyyyHH}.txt";
+            Console.WriteLine(toWrite);
 
             try
             {
+                if (!Directory.Exists("Logs"))
+                {
+                    Directory.CreateDirectory("Logs");
+                }
+
                 if (!File.Exists(filePath))
                 {
                     File.Create(filePath).Close();

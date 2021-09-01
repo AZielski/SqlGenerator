@@ -13,13 +13,13 @@
 </head>
 
 <body>
-    ##DB##
-
     <!-- NAVBAR -->
 
     ##NAVBAR##
 
     <!-- END NAVBAR -->
+
+    ##DB##
 
     <!-- HTML Content -->
 

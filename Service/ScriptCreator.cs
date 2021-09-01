@@ -8,14 +8,14 @@ namespace Service
 {
     public static class ScriptCreator
     {
-        private static readonly Dictionary<string, string> DbMysqlTypes = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> DbMysqlTypes = new()
         {
-            {"varchar", "VARCHAR" },
-            {"text", "TEXT" },
-            {"int", "INT" },
-            {"decimal", "DECIMAL" },
-            {"datetime", "DATETIME" },
-            {"date", "DATE" },
+            { "varchar", "VARCHAR" },
+            { "text", "TEXT" },
+            { "int", "INT" },
+            { "decimal", "DECIMAL" },
+            { "datetime", "DATETIME" },
+            { "date", "DATE" },
         };
 
         private static string CreateWithEndLine(string data) => $"{data}\n";
@@ -30,19 +30,16 @@ namespace Service
             try
             {
                 var result = CreateWithEndLine("SET SQL_MODE = \"NO_AUTO_VALUE_ON_ZERO\";");
+
                 result += CreateWithEndLine("START TRANSACTION;");
                 result += CreateWithEndLine("SET time_zone = \"+00:00\";");
                 result += CreateWithEndLine("/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;");
                 result += CreateWithEndLine("/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;");
                 result += CreateWithEndLine("/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;");
                 result += CreateWithEndLine("/*!40101 SET NAMES utf8mb4 */;");
-
-                foreach (var table in dbToGenerate.Tables)
-                {
-                    result += CreateTables(table);
-                }
-
+                result += dbToGenerate.Tables.Select(CreateTables);
                 result += CreateWithEndLine("COMMIT;");
+
                 return result;
             }
             catch (Exception ex)

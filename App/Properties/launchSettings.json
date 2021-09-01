@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "SqlGenerator": {
-      "commandName": "Project",
-      "commandLineArgs": "--generate-web"
-    }
-  }
-}

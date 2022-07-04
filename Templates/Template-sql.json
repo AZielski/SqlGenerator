@@ -1,5 +1,5 @@
 {
-    "DBName": "DBName",
+    "DbName": "DBName",
     "Collation": "utf8_general_ci",
     "Tables": [
         {
@@ -7,7 +7,7 @@
             "TableColumns": [
                 {
                     "ColumnName": "address_pk",
-                    "DBType": "int",
+                    "DbType": "int",
                     "IsPrimaryKey": true,
                     "IsAutoIncrement": true,
                     "IsNullable": false,
@@ -17,7 +17,7 @@
                 },
                 {
                     "ColumnName": "address",
-                    "DBType": "varchar",
+                    "DbType": "varchar",
                     "IsPrimaryKey": false,
                     "IsAutoIncrement": false,
                     "IsNullable": true,
@@ -32,7 +32,7 @@
             "TableColumns": [
                 {
                     "ColumnName": "work_pk",
-                    "DBType": "int",
+                    "DbType": "int",
                     "IsPrimaryKey": true,
                     "IsAutoIncrement": true,
                     "IsNullable": false,
@@ -42,7 +42,7 @@
                 },
                 {
                     "ColumnName": "name",
-                    "DBType": "decimal",
+                    "DbType": "decimal",
                     "IsPrimaryKey": false,
                     "IsAutoIncrement": false,
                     "IsNullable": true,
@@ -57,7 +57,7 @@
             "TableColumns": [
                 {
                     "ColumnName": "person_key",
-                    "DBType": "int",
+                    "DbType": "int",
                     "IsPrimaryKey": true,
                     "IsAutoIncrement": true,
                     "IsNullable": false,
@@ -67,7 +67,7 @@
                 },
                 {
                     "ColumnName": "name",
-                    "DBType": "varchar",
+                    "DbType": "varchar",
                     "IsPrimaryKey": false,
                     "IsAutoIncrement": false,
                     "IsNullable": false,
@@ -77,7 +77,7 @@
                 },
                 {
                     "ColumnName": "lastname",
-                    "DBType": "varchar",
+                    "DbType": "varchar",
                     "IsPrimaryKey": false,
                     "IsAutoIncrement": false,
                     "IsNullable": false,
@@ -87,7 +87,7 @@
                 },
                 {
                     "ColumnName": "birthdate",
-                    "DBType": "date",
+                    "DbType": "date",
                     "IsPrimaryKey": false,
                     "IsAutoIncrement": false,
                     "IsNullable": false,
@@ -97,7 +97,7 @@
                 },
                 {
                     "ColumnName": "address_fk",
-                    "DBType": "int",
+                    "DbType": "int",
                     "IsPrimaryKey": false,
                     "IsAutoIncrement": false,
                     "IsNullable": false,
@@ -110,7 +110,7 @@
                 },
                 {
                     "ColumnName": "work_fk",
-                    "DBType": "int",
+                    "DbType": "int",
                     "IsPrimaryKey": false,
                     "IsAutoIncrement": false,
                     "IsNullable": false,

@@ -33,11 +33,16 @@ namespace Service
 
                 result += CreateWithEndLine("START TRANSACTION;");
                 result += CreateWithEndLine("SET time_zone = \"+00:00\";");
+                result += CreateWithEndLine("CREATE DATABASE IF NOT EXISTS `" + dbToGenerate.DbName + "`;");
+                result += CreateWithEndLine("USE `" + dbToGenerate.DbName + "`;");
                 result += CreateWithEndLine("/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;");
                 result += CreateWithEndLine("/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;");
                 result += CreateWithEndLine("/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;");
                 result += CreateWithEndLine("/*!40101 SET NAMES utf8mb4 */;");
-                result += dbToGenerate.Tables.Select(CreateTables);
+                foreach (var line in dbToGenerate.Tables.Select(CreateTables))
+                {
+                    result += line;
+                }
                 result += CreateWithEndLine("COMMIT;");
 
                 return result;

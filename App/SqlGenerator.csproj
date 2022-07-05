@@ -15,6 +15,7 @@
     <Description>Product for generation MySQL databases from json file.</Description>
     <Product>MySql generator</Product>
     <LangVersion>default</LangVersion>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
